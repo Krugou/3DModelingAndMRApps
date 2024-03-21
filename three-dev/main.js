@@ -1,67 +1,66 @@
 import * as THREE from 'three';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 
-const scene = new THREE.Scene();
+let container, camera, scene, renderer, cube, controls;
 
-const camera = new THREE.PerspectiveCamera(
-	75,
-	window.innerWidth / window.innerHeight,
-	0.1,
-	1000,
-);
+init();
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.body.appendChild(renderer.domElement);
+function init() {
+	container = document.createElement('div');
+	document.body.appendChild(container);
 
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+	scene = new THREE.Scene();
+	camera = new THREE.PerspectiveCamera(
+		75,
+		window.innerWidth / window.innerHeight,
+		0.1,
+		1000,
+	);
 
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+	renderer = new THREE.WebGLRenderer();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	container.appendChild(renderer.domElement);
 
-camera.position.z = 5;
+	const geometry = new THREE.BoxGeometry(1, 1, 1);
+	const material = new THREE.MeshPhongMaterial({color: 0x00ff00});
+	cube = new THREE.Mesh(geometry, material);
+	scene.add(cube);
 
-let bounds = new THREE.Vector3(
-	5 * (window.innerWidth / window.innerHeight),
-	5,
-	0,
-);
+	const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+	scene.add(directionalLight);
 
-// Set initial position of the cube
-cube.position.x = Math.random() * bounds.x * 2 - bounds.x;
-cube.position.y = Math.random() * bounds.y * 2 - bounds.y;
+	const axesHelper = new THREE.AxesHelper(5);
+	scene.add(axesHelper);
+	const light = new THREE.AmbientLight(0x404040); // soft white light
+	scene.add(light);
+	camera.position.set(2, 2, 2);
+	camera.lookAt(axesHelper.position);
+	camera.lookAt(new THREE.Vector3(0, 0, 0));
 
-// Declare and set initial velocity of the cube
-let velocity = new THREE.Vector3(
-	(Math.random() - 0.9) * 0.1,
-	(Math.random() - 0.9) * 0.1,
-	0,
-);
+	controls = new OrbitControls(camera, renderer.domElement);
 
-cube.rotation.x = Math.random() * Math.PI * 2;
-cube.rotation.y = Math.random() * Math.PI * 2;
+	//controls.update() must be called after any manual changes to the camera's transform
+	camera.position.set(0, 20, 100);
+	controls.update();
 
-const animate = () => {
+	cube.position.x = 0;
+	cube.scale.set(2, 2, 2);
+	cube.rotation.y = Math.PI / 4;
+
+	animate();
+}
+
+function animate() {
 	requestAnimationFrame(animate);
 
-	cube.position.add(velocity);
-
-	if (Math.abs(cube.position.x) > bounds.x) {
-		velocity.x *= -1;
-	}
-	if (Math.abs(cube.position.y) > bounds.y) {
-		velocity.y *= -1;
-	}
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.01;
+	controls.update();
 	renderer.render(scene, camera);
-};
+}
 
-animate();
+window.addEventListener('resize', resize, false);
 
-window.addEventListener('resize', function () {
+function resize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	bounds.x = 5 * (window.innerWidth / window.innerHeight);
-});
+}
