@@ -1,8 +1,8 @@
 {
 	"type": "module",
 	"scripts": {
-		"dev": "vite --port 1989 --open --host",
-		"build": "vite build"
+		"dev": "npm i && vite --port 1989 --open --host",
+		"build": "npm i && vite build"
 	},
 	"dependencies": {
 		"three": "^0.162.0"
