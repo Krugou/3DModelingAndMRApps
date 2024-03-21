@@ -1,15 +1,7 @@
 import * as THREE from 'three';
 
-/**
- * Represents the main scene of the application.
- * @type {THREE.Scene}
- */
 const scene = new THREE.Scene();
 
-/**
- * Represents the camera used to view the scene.
- * @type {THREE.PerspectiveCamera}
- */
 const camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
@@ -24,25 +16,31 @@ document.body.appendChild(renderer.domElement);
 const geometry = new THREE.BoxGeometry(1, 1, 1);
 const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
 
-/**
- * Represents a cube mesh in the scene.
- * @type {THREE.Mesh}
- */
 const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
 camera.position.z = 5;
 
-let velocity = new THREE.Vector3(0.05, 0.05, 0);
 let bounds = new THREE.Vector3(
 	5 * (window.innerWidth / window.innerHeight),
 	5,
 	0,
 );
 
-/**
- * Animates the scene by updating the cube's rotation and rendering the scene.
- */
+// Set initial position of the cube
+cube.position.x = Math.random() * bounds.x * 2 - bounds.x;
+cube.position.y = Math.random() * bounds.y * 2 - bounds.y;
+
+// Declare and set initial velocity of the cube
+let velocity = new THREE.Vector3(
+	(Math.random() - 0.9) * 0.1,
+	(Math.random() - 0.9) * 0.1,
+	0,
+);
+
+cube.rotation.x = Math.random() * Math.PI * 2;
+cube.rotation.y = Math.random() * Math.PI * 2;
+
 const animate = () => {
 	requestAnimationFrame(animate);
 
