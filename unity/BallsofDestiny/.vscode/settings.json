@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Balls of Destiny.sln"
+    "dotnet.defaultSolution": "BallsofDestiny.sln"
 }
