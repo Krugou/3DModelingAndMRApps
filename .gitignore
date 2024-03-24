@@ -199,3 +199,4 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /unity/*/[Aa]ssets/[Ss]treamingAssets/aa.meta
 /unity/*/[Aa]ssets/[Ss]treamingAssets/aa/*
+web/package-lock.json

@@ -2,7 +2,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "npm i && vite --port 1989 --open --host",
-		"build": "npm i && vite build"
+		"build": "npm i && vite build --emptyOutDir"
 	},
 	"dependencies": {
 		"three": "^0.162.0"
