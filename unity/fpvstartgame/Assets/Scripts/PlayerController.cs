@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         // Read input (keyboard)
         xInput = Input.GetAxisRaw("Horizontal");
-        yInput = -Input.GetAxisRaw("Vertical");
+        yInput = Input.GetAxisRaw("Vertical");
     }
 
     void FixedUpdate()
