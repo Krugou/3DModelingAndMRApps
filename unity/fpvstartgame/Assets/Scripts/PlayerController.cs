@@ -5,6 +5,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float speed;
+    public float jumpForce = 5f; // Set the jump force
+    public float jumpSpeed = 1f; // Set the jump speed
     public Transform orientation;
     private float xInput;
     private float yInput;
@@ -24,8 +26,9 @@ public class PlayerController : MonoBehaviour
     {
         // Read input (keyboard)
         xInput = Input.GetAxisRaw("Horizontal");
-        yInput = Input.GetAxisRaw("Vertical");
+        yInput = -Input.GetAxisRaw("Vertical");
     }
+
     void FixedUpdate()
     {
         // Calculate correct direction
@@ -38,6 +41,12 @@ public class PlayerController : MonoBehaviour
         {
             Vector3 maxVelocity = groundVelocity.normalized * speed;
             rb.velocity = new Vector3(maxVelocity.x, rb.velocity.y, maxVelocity.z);
+        }
+
+        // Jump when the space bar is pressed
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
         }
     }
 }
