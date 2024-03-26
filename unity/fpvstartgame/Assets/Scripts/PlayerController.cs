@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private float yInput;
     private Vector3 movingDirection;
     private Rigidbody rb;
-
+    public GameObject plane;
     // Start is called before the first frame update
     void Start()
     {
@@ -48,5 +48,17 @@ public class PlayerController : MonoBehaviour
         {
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
         }
+
+        // Get the size of the plane
+        Vector3 planeSize = plane.GetComponent<Renderer>().bounds.size;
+
+        // Define an offset to make the boundaries tighter
+        float offset = 1.0f; // You can adjust this value to get the desired tightness
+
+        // Clamp the position of the BallKing within the boundaries of the plane
+        Vector3 position = rb.position;
+        position.x = Mathf.Clamp(position.x, -planeSize.x / 2 + offset, planeSize.x / 2 - offset);
+        position.z = Mathf.Clamp(position.z, -planeSize.z / 2 + offset, planeSize.z / 2 - offset);
+        rb.position = position;
     }
 }
