@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using TMPro;
 public class PlayerController : MonoBehaviour
 {
     public float speed;
@@ -13,12 +14,18 @@ public class PlayerController : MonoBehaviour
     private Vector3 movingDirection;
     private Rigidbody rb;
     public GameObject plane;
+    public TextMeshProUGUI TargetText;
+
+    public GameObject secondplane;
+
+    public GameObject securityWalls;
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("PlayerController.Start()");
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        securityWalls.SetActive(false);
     }
 
     // Update is called once per frame
@@ -60,5 +67,12 @@ public class PlayerController : MonoBehaviour
         position.x = Mathf.Clamp(position.x, -planeSize.x / 2 + offset, planeSize.x / 2 - offset);
         position.z = Mathf.Clamp(position.z, -planeSize.z / 2 + offset, planeSize.z / 2 - offset);
         rb.position = position;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject == secondplane)
+        {
+            securityWalls.SetActive(true);
+        }
     }
 }
