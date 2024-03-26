@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
-
 // Declare variables for the scene, camera, renderer, cube, and controls
 let container, camera, scene, renderer, cube, controls;
 
@@ -17,6 +18,8 @@ function init() {
 
 	// Create a new THREE.Scene object
 	scene = new THREE.Scene();
+
+	loadmodels();
 
 	// Create a new THREE.PerspectiveCamera object
 	camera = new THREE.PerspectiveCamera(
@@ -71,6 +74,31 @@ function init() {
 
 	// Call the animate function to start the animation loop
 	animate();
+}
+function loadmodels() {
+	new RGBELoader()
+		.setPath('/')
+		.load('hdr/golden_bay_4k.hdr', function (texture) {
+			texture.mapping = THREE.EquirectangularReflectionMapping;
+
+			scene.background = texture;
+			scene.environment = texture;
+
+			// model
+
+			const loader = new GLTFLoader().setPath('/');
+			loader.load('mazda.gltf', async function (gltf) {
+				const model = gltf.scene;
+
+				// wait until the model can be added to the scene without blocking due to shader compilation
+
+				await renderer.compileAsync(model, camera, scene);
+
+				scene.add(model);
+
+				render();
+			});
+		});
 }
 
 /**
