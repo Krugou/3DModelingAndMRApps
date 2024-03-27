@@ -27,7 +27,8 @@ public class CameraRayController : MonoBehaviour
 
         if (Physics.Raycast(transform.position, rayDirection, out hit, 50))
         {
-            //Debug.Log("hitting something: " + hit.collider.gameObject.name);
+
+            Debug.Log("hitting something: " + hit.collider.gameObject.name);
             if (hit.collider.CompareTag("InfoSpot"))
             {
                 DisplayInfoText(hit.collider.gameObject.name);
