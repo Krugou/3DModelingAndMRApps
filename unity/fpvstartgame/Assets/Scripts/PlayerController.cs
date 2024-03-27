@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
+using TMPro;
 public class PlayerController : MonoBehaviour
 {
     public float speed;
@@ -12,13 +13,19 @@ public class PlayerController : MonoBehaviour
     private float yInput;
     private Vector3 movingDirection;
     private Rigidbody rb;
+    public GameObject plane;
+    public TextMeshProUGUI TargetText;
 
+    public GameObject secondplane;
+
+    public GameObject securityWalls;
     // Start is called before the first frame update
     void Start()
     {
         Debug.Log("PlayerController.Start()");
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+        securityWalls.SetActive(false);
     }
 
     // Update is called once per frame
@@ -47,6 +54,25 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
+        }
+
+        // Get the size of the plane
+        Vector3 planeSize = plane.GetComponent<Renderer>().bounds.size;
+
+        // Define an offset to make the boundaries tighter
+        float offset = 1.0f; // You can adjust this value to get the desired tightness
+
+        // Clamp the position of the BallKing within the boundaries of the plane
+        Vector3 position = rb.position;
+        position.x = Mathf.Clamp(position.x, -planeSize.x / 2 + offset, planeSize.x / 2 - offset);
+        position.z = Mathf.Clamp(position.z, -planeSize.z / 2 + offset, planeSize.z / 2 - offset);
+        rb.position = position;
+    }
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject == secondplane)
+        {
+            securityWalls.SetActive(true);
         }
     }
 }
