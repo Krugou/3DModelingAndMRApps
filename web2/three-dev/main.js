@@ -78,7 +78,7 @@ function init() {
 function loadmodels() {
 	new RGBELoader()
 		.setPath('/')
-		.load('hdr/golden_bay_4k.hdr', function (texture) {
+		.load('./hdr/golden_bay_4k.hdr', function (texture) {
 			texture.mapping = THREE.EquirectangularReflectionMapping;
 
 			scene.background = texture;
@@ -87,7 +87,7 @@ function loadmodels() {
 			// modelmazda
 
 			const loader = new GLTFLoader().setPath('/');
-			loader.load('mazda.gltf', async function (gltf) {
+			loader.load('./mazda.gltf', async function (gltf) {
 				const modelmazda = gltf.scene;
 
 				// wait until the model can be added to the scene without blocking due to shader compilation
@@ -101,7 +101,7 @@ function loadmodels() {
 			});
 
 			// model2
-			loader.load('tow_boat/scene.gltf', async function (gltf) {
+			loader.load('./tow_boat/scene.gltf', async function (gltf) {
 				const model2 = gltf.scene;
 
 				// wait until the model can be added to the scene without blocking due to shader compilation
@@ -114,7 +114,7 @@ function loadmodels() {
 				// render();
 			});
 			// model2
-			loader.load('street_lamp/street_lamp.gltf', async function (gltf) {
+			loader.load('./street_lamp/street_lamp.gltf', async function (gltf) {
 				const model3 = gltf.scene;
 
 				// wait until the model can be added to the scene without blocking due to shader compilation
