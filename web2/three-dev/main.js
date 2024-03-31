@@ -4,7 +4,7 @@ import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 // Declare variables for the scene, camera, renderer, cube, and controls
 let container, camera, scene, renderer, cube, controls;
-
+let lastLoggedPosition = null;
 // Call the init function to initialize the scene
 init();
 
@@ -37,11 +37,11 @@ function init() {
 	container.appendChild(renderer.domElement);
 
 	// Create a cube using THREE.BoxGeometry and THREE.MeshPhongMaterial
-	const geometry = new THREE.BoxGeometry(1, 1, 1);
-	const material = new THREE.MeshPhongMaterial({color: 0x00ff00});
-	cube = new THREE.Mesh(geometry, material);
+	// const geometry = new THREE.BoxGeometry(1, 1, 1);
+	// const material = new THREE.MeshPhongMaterial({color: 0x00ff00});
+	// cube = new THREE.Mesh(geometry, material);
 	// Add the cube to the scene
-	scene.add(cube);
+	// scene.add(cube);
 
 	// Add a directional light to the scene
 	const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -64,13 +64,13 @@ function init() {
 	controls = new OrbitControls(camera, renderer.domElement);
 
 	// Update the controls after any manual changes to the camera's transform
-	camera.position.set(0, 20, 100);
+	camera.position.set(7, 3, 6);
 	controls.update();
 
-	// Set the cube's position, scale, and rotation
-	cube.position.x = 0;
-	cube.scale.set(2, 2, 2);
-	cube.rotation.y = Math.PI / 4;
+	// // Set the cube's position, scale, and rotation
+	// cube.position.x = 0;
+	// cube.scale.set(2, 2, 2);
+	// cube.rotation.y = Math.PI / 4;
 
 	// Call the animate function to start the animation loop
 	animate();
@@ -84,19 +84,47 @@ function loadmodels() {
 			scene.background = texture;
 			scene.environment = texture;
 
-			// model
+			// modelmazda
 
 			const loader = new GLTFLoader().setPath('/');
 			loader.load('mazda.gltf', async function (gltf) {
-				const model = gltf.scene;
+				const modelmazda = gltf.scene;
 
 				// wait until the model can be added to the scene without blocking due to shader compilation
+				modelmazda.position.set(17, 0, -1);
 
-				await renderer.compileAsync(model, camera, scene);
+				await renderer.compileAsync(modelmazda, camera, scene);
 
-				scene.add(model);
+				scene.add(modelmazda);
 
-				render();
+				// render();
+			});
+
+			// model2
+			loader.load('tow_boat/scene.gltf', async function (gltf) {
+				const model2 = gltf.scene;
+
+				// wait until the model can be added to the scene without blocking due to shader compilation
+				model2.position.set(-20, -10, -1);
+
+				await renderer.compileAsync(model2, camera, scene);
+
+				scene.add(model2);
+
+				// render();
+			});
+			// model2
+			loader.load('street_lamp/street_lamp.gltf', async function (gltf) {
+				const model3 = gltf.scene;
+
+				// wait until the model can be added to the scene without blocking due to shader compilation
+				model3.position.set(0, 0, -1);
+
+				await renderer.compileAsync(model3, camera, scene);
+
+				scene.add(model3);
+
+				// render();
 			});
 		});
 }
@@ -111,6 +139,11 @@ function animate() {
 	// Update the controls and render the scene with the camera
 	controls.update();
 	renderer.render(scene, camera);
+	// Log the camera's position only when it changes
+	if (!lastLoggedPosition || !camera.position.equals(lastLoggedPosition)) {
+		console.log(camera.position);
+		lastLoggedPosition = camera.position.clone();
+	}
 }
 
 // Add an event listener for the window resize event

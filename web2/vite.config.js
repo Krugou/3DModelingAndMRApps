@@ -1,11 +1,11 @@
-import {defineConfig} from 'vite';
 import {terser} from 'rollup-plugin-terser';
+import {defineConfig} from 'vite';
 
 export default defineConfig({
 	root: 'three-dev',
 	publicDir: '../3d-assets',
 	build: {
-		outDir: '../../webBuild',
+		outDir: '../../webBuild2',
 		emptyOutDir: true,
 		rollupOptions: {
 			plugins: [terser({compress: {drop_console: true}})],
