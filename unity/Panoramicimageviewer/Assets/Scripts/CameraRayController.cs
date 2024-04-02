@@ -7,8 +7,10 @@ using UnityEngine.UI;
 public class CameraRayController : MonoBehaviour
 {
     Text infoText;
+
     Slider delaySlider;
     float delayTimer = 0f;
+    float delayMax = 10;
 
     void Start()
     {
@@ -35,7 +37,7 @@ public class CameraRayController : MonoBehaviour
             }
             if (hit.collider.CompareTag("TeleportSpot"))
             {
-                MoveToScene(hit.collider.gameObject.name);
+                StartCoroutine(MoveToScene(hit.collider.gameObject.name));
             }
         }
         else
@@ -49,23 +51,44 @@ public class CameraRayController : MonoBehaviour
         infoText.enabled = true;
         if (gameObjectName == "InfoCapsule")
         {
-            infoText.text = "This is a capsule on a table";
+            infoText.text = "This is a plushie";
+        }
+        else if (gameObjectName == "WhiteBoard")
+        {
+            infoText.text = "This is a whiteboard";
+        }
+        else if (gameObjectName == "Chair")
+        {
+            infoText.text = "This is a chair";
+        }
+        else if (gameObjectName == "Ball")
+        {
+            infoText.text = "This is a ball";
         }
         else
         {
-            infoText.text = "This is a default message.";
+            infoText.text = "You are looking at " + gameObjectName + " object.";
         }
     }
 
-    void MoveToScene(string sceneName)
+    IEnumerator MoveToScene(string sceneName)
     {
-        delayTimer = delayTimer + Time.deltaTime;
         delaySlider.gameObject.SetActive(true);
-        delaySlider.value = delayTimer;
-        if (delayTimer > 2)
+        Camera mainCamera = Camera.main; // Get the main camera
+        float initialFOV = mainCamera.fieldOfView; // Store the initial FOV
+
+        while (delayTimer < 2)
         {
-            SceneManager.LoadScene(sceneName);
+            delayTimer += Time.deltaTime;
+            delaySlider.value = delayTimer;
+
+            // Zoom in by decreasing the FOV
+            mainCamera.fieldOfView = Mathf.Lerp(initialFOV, 0, delayTimer / delayMax); // Adjust this value to match the duration of the transition
+
+            yield return null;
         }
+
+        SceneManager.LoadScene(sceneName);
     }
 
     void ResetHit()
