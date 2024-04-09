@@ -76,80 +76,82 @@ function init() {
 	animate();
 }
 function loadmodels() {
-	new RGBELoader().setPath('/').load('hdr/Scenery.hdr', function (texture) {
-		texture.mapping = THREE.EquirectangularReflectionMapping;
+	new RGBELoader()
+		.setPath('/')
+		.load('3DModelingAndMRApps/webBuild4/hdr/Scenery.hdr', function (texture) {
+			texture.mapping = THREE.EquirectangularReflectionMapping;
 
-		scene.background = texture;
-		scene.environment = texture;
-		renderer.toneMappingExposure = 10.0;
-		// modelmazda
+			scene.background = texture;
+			scene.environment = texture;
+			renderer.toneMappingExposure = 10.0;
+			// modelmazda
 
-		const loader = new GLTFLoader().setPath('/');
-		loader.load(
-			'3DModelingAndMRApps/webBuild4/mazda.gltf',
-			async function (gltf) {
-				const modelmazda = gltf.scene;
+			const loader = new GLTFLoader().setPath('/');
+			loader.load(
+				'3DModelingAndMRApps/webBuild4/mazda.gltf',
+				async function (gltf) {
+					const modelmazda = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				modelmazda.position.set(17, 0, -1);
+					// wait until the model can be added to the scene without blocking due to shader compilation
+					modelmazda.position.set(17, 0, -1);
 
-				await renderer.compileAsync(modelmazda, camera, scene);
+					await renderer.compileAsync(modelmazda, camera, scene);
 
-				scene.add(modelmazda);
+					scene.add(modelmazda);
 
-				// render();
-			},
-		);
+					// render();
+				},
+			);
 
-		// model2
-		loader.load(
-			'3DModelingAndMRApps/webBuild4/tow_boat/scene.gltf',
-			async function (gltf) {
-				const model2 = gltf.scene;
+			// model2
+			loader.load(
+				'3DModelingAndMRApps/webBuild4/tow_boat/scene.gltf',
+				async function (gltf) {
+					const model2 = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				model2.position.set(-20, -10, -1);
+					// wait until the model can be added to the scene without blocking due to shader compilation
+					model2.position.set(-20, -10, -1);
 
-				await renderer.compileAsync(model2, camera, scene);
+					await renderer.compileAsync(model2, camera, scene);
 
-				scene.add(model2);
+					scene.add(model2);
 
-				// render();
-			},
-		);
-		// model3
-		loader.load(
-			'3DModelingAndMRApps/webBuild4/street_lamp/street_lamp.gltf',
-			async function (gltf) {
-				const model3 = gltf.scene;
+					// render();
+				},
+			);
+			// model3
+			loader.load(
+				'3DModelingAndMRApps/webBuild4/street_lamp/street_lamp.gltf',
+				async function (gltf) {
+					const model3 = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				model3.position.set(0, 0, -1);
+					// wait until the model can be added to the scene without blocking due to shader compilation
+					model3.position.set(0, 0, -1);
 
-				await renderer.compileAsync(model3, camera, scene);
+					await renderer.compileAsync(model3, camera, scene);
 
-				scene.add(model3);
+					scene.add(model3);
 
-				// render();
-			},
-		);
-		// model2
-		loader.load(
-			'3DModelingAndMRApps/webBuild4/mylandscape/landscape.gltf',
-			async function (gltf) {
-				const model2 = gltf.scene;
+					// render();
+				},
+			);
+			// model2
+			loader.load(
+				'3DModelingAndMRApps/webBuild4/mylandscape/landscape.gltf',
+				async function (gltf) {
+					const model2 = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				model2.position.set(-20, -10, -1);
+					// wait until the model can be added to the scene without blocking due to shader compilation
+					model2.position.set(-20, -10, -1);
 
-				await renderer.compileAsync(model2, camera, scene);
+					await renderer.compileAsync(model2, camera, scene);
 
-				scene.add(model2);
+					scene.add(model2);
 
-				// render();
-			},
-		);
-	});
+					// render();
+				},
+			);
+		});
 }
 
 /**
