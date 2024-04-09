@@ -86,7 +86,7 @@ function loadmodels() {
 
 		const loader = new GLTFLoader().setPath('/');
 		loader.load(
-			'3DModelingAndMRApps/webBuild3/mazda.gltf',
+			'3DModelingAndMRApps/webBuild4/mazda.gltf',
 			async function (gltf) {
 				const modelmazda = gltf.scene;
 
@@ -103,7 +103,7 @@ function loadmodels() {
 
 		// model2
 		loader.load(
-			'3DModelingAndMRApps/webBuild2/tow_boat/scene.gltf',
+			'3DModelingAndMRApps/webBuild4/tow_boat/scene.gltf',
 			async function (gltf) {
 				const model2 = gltf.scene;
 
@@ -117,9 +117,9 @@ function loadmodels() {
 				// render();
 			},
 		);
-		// model2
+		// model3
 		loader.load(
-			'3DModelingAndMRApps/webBuild2/street_lamp/street_lamp.gltf',
+			'3DModelingAndMRApps/webBuild4/street_lamp/street_lamp.gltf',
 			async function (gltf) {
 				const model3 = gltf.scene;
 
@@ -129,6 +129,22 @@ function loadmodels() {
 				await renderer.compileAsync(model3, camera, scene);
 
 				scene.add(model3);
+
+				// render();
+			},
+		);
+		// model2
+		loader.load(
+			'3DModelingAndMRApps/webBuild4/mylandscape/landscape.gltf',
+			async function (gltf) {
+				const model2 = gltf.scene;
+
+				// wait until the model can be added to the scene without blocking due to shader compilation
+				model2.position.set(-20, -10, -1);
+
+				await renderer.compileAsync(model2, camera, scene);
+
+				scene.add(model2);
 
 				// render();
 			},
