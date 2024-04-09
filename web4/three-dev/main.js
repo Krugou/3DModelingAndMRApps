@@ -135,7 +135,7 @@ function loadmodels() {
 			const model2 = gltf.scene;
 
 			// wait until the model can be added to the scene without blocking due to shader compilation
-			model2.position.set(-20, -10, -1);
+			model2.position.set(0, 0, 0);
 
 			await renderer.compileAsync(model2, camera, scene);
 
@@ -150,17 +150,10 @@ function loadmodels() {
  * Animates the scene by updating the controls and rendering the scene with the camera.
  */
 function animate() {
-	// Request the next animation frame
-	requestAnimationFrame(animate);
-
-	// Update the controls and render the scene with the camera
-	controls.update();
-	renderer.render(scene, camera);
-	// Log the camera's position only when it changes
-	if (!lastLoggedPosition || !camera.position.equals(lastLoggedPosition)) {
-		console.log(camera.position);
-		lastLoggedPosition = camera.position.clone();
-	}
+	renderer.setAnimationLoop(function () {
+		renderer.render(scene, camera);
+		controls.update();
+	});
 }
 
 // Add an event listener for the window resize event
