@@ -3,7 +3,7 @@
 	"scripts": {
 		"start": "npm run dev",
 		"dev": "npm i && vite --port 1989 --open --host",
-		"build": "npm i && vite build --base /3DModelingAndMRApps/webBuild4/ --emptyOutDir"
+		"build": "npm i && vite build --emptyOutDir"
 	},
 	"dependencies": {
 		"rollup-plugin-terser": "^7.0.2",

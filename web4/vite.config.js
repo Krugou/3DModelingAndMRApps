@@ -1,7 +1,7 @@
 import {terser} from 'rollup-plugin-terser';
 import {defineConfig} from 'vite';
 
-export default defineConfig({
+export default ({command}) => ({
 	root: 'three-dev',
 	publicDir: '../3d-assets',
 	build: {
@@ -11,4 +11,5 @@ export default defineConfig({
 			plugins: [terser({compress: {drop_console: true}})],
 		},
 	},
+	base: command === 'serve' ? '/' : '/3DModelingAndMRApps/webBuild4/',
 });
