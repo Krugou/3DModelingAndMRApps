@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
+import {VRButton} from 'three/addons/webxr/VRButton.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
-
+let basePath;
 if (import.meta.env.MODE === 'production') {
 	basePath = '/3DModelingAndMRApps/webBuild4/';
 } else {
@@ -36,10 +37,9 @@ function init() {
 	);
 
 	// Create a new THREE.WebGLRenderer object
-	renderer = new THREE.WebGLRenderer();
-	// Set the size of the renderer to the window size
+	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	// Append the renderer's domElement (the canvas) to the container
+	renderer.xr.enabled = true;
 	container.appendChild(renderer.domElement);
 
 	// Create a cube using THREE.BoxGeometry and THREE.MeshPhongMaterial
@@ -77,7 +77,7 @@ function init() {
 	// cube.position.x = 0;
 	// cube.scale.set(2, 2, 2);
 	// cube.rotation.y = Math.PI / 4;
-
+	document.body.appendChild(VRButton.createButton(renderer));
 	// Call the animate function to start the animation loop
 	animate();
 }
@@ -91,21 +91,18 @@ function loadmodels() {
 		// modelmazda
 
 		const loader = new GLTFLoader().setPath(basePath);
-		loader.load(
-			'3DModelingAndMRApps/webBuild4/mazda.gltf',
-			async function (gltf) {
-				const modelmazda = gltf.scene;
+		loader.load('mazda.gltf', async function (gltf) {
+			const modelmazda = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				modelmazda.position.set(17, 0, -1);
+			// wait until the model can be added to the scene without blocking due to shader compilation
+			modelmazda.position.set(17, 0, -1);
 
-				await renderer.compileAsync(modelmazda, camera, scene);
+			await renderer.compileAsync(modelmazda, camera, scene);
 
-				scene.add(modelmazda);
+			scene.add(modelmazda);
 
-				// render();
-			},
-		);
+			// render();
+		});
 
 		// model2
 		loader.load('tow_boat/scene.gltf', async function (gltf) {
