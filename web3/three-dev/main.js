@@ -2,6 +2,13 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
+let basePath;
+if (import.meta.env.MODE === 'production') {
+	basePath = '/3DModelingAndMRApps/webBuild3/';
+} else {
+	basePath = '/';
+}
+let animalmodel;
 // Declare variables for the scene, camera, renderer, cube, and controls
 let container, camera, scene, renderer, cube, controls;
 let lastLoggedPosition = null;
@@ -75,8 +82,9 @@ function init() {
 	// Call the animate function to start the animation loop
 	animate();
 }
+
 function loadmodels() {
-	new RGBELoader().setPath('/').load('hdr/Scenery.hdr', function (texture) {
+	new RGBELoader().setPath(basePath).load('hdr/Scenery.hdr', function (texture) {
 		texture.mapping = THREE.EquirectangularReflectionMapping;
 
 		scene.background = texture;
@@ -84,55 +92,48 @@ function loadmodels() {
 		renderer.toneMappingExposure = 10.0;
 		// modelmazda
 
-		const loader = new GLTFLoader().setPath('/');
-		loader.load(
-			'3DModelingAndMRApps/webBuild3/mazda.gltf',
-			async function (gltf) {
-				const modelmazda = gltf.scene;
-
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				modelmazda.position.set(17, 0, -1);
-
-				await renderer.compileAsync(modelmazda, camera, scene);
-
-				scene.add(modelmazda);
-
-				// render();
-			},
-		);
+		const loader = new GLTFLoader().setPath(basePath);
+		loader.load('animalmodel.gltf', async function (gltf) {
+			animalmodel = gltf.scene;
+			animalmodel.position.set(3, 0, -1);
+			await renderer.compileAsync(animalmodel, camera, scene);
+			scene.add(animalmodel);
+		});
 
 		// model2
-		loader.load(
-			'3DModelingAndMRApps/webBuild2/tow_boat/scene.gltf',
-			async function (gltf) {
-				const model2 = gltf.scene;
+		// loader.setPath(basePath).load(
+		// 	'tow_boat/scene.gltf',
+		// 	async function (gltf) {
+		// 		const model2 = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				model2.position.set(-20, -10, -1);
+		// 		// wait until the model can be added to the scene without blocking due to shader compilation
+		// 		model2.position.set(-20, -10, -1);
 
-				await renderer.compileAsync(model2, camera, scene);
+		// 		await renderer.compileAsync(model2, camera, scene);
 
-				scene.add(model2);
+		// 		scene.add(model2);
 
-				// render();
-			},
-		);
+		// 		// render();
+		// 	},
+		// );
 		// model2
-		loader.load(
-			'3DModelingAndMRApps/webBuild2/street_lamp/street_lamp.gltf',
-			async function (gltf) {
-				const model3 = gltf.scene;
+		// loader
+		// 	.setPath(basePath)
+		// 	.load(
+		// 		'3DModelingAndMRApps/webBuild3/street_lamp/street_lamp.gltf',
+		// 		async function (gltf) {
+		// 			const model3 = gltf.scene;
 
-				// wait until the model can be added to the scene without blocking due to shader compilation
-				model3.position.set(0, 0, -1);
+		// 			// wait until the model can be added to the scene without blocking due to shader compilation
+		// 			model3.position.set(0, 0, -1);
 
-				await renderer.compileAsync(model3, camera, scene);
+		// 			await renderer.compileAsync(model3, camera, scene);
 
-				scene.add(model3);
+		// 			scene.add(model3);
 
-				// render();
-			},
-		);
+		// 			// render();
+		// 		},
+		// 	);
 	});
 }
 
@@ -142,7 +143,9 @@ function loadmodels() {
 function animate() {
 	// Request the next animation frame
 	requestAnimationFrame(animate);
-
+	if (animalmodel) {
+		animalmodel.rotation.y += 0.01; // Adjust this value to change the speed of rotation
+	}
 	// Update the controls and render the scene with the camera
 	controls.update();
 	renderer.render(scene, camera);
