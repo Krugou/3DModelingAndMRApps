@@ -10,6 +10,9 @@ if (import.meta.env.MODE === 'production') {
 } else {
 	basePath = '/';
 }
+// create a new empty group to include imported models you want to interact with
+let group = new THREE.Group();
+group.name = 'Interaction-Group';
 let controller1, controller2;
 let controllerGrip1, controllerGrip2;
 let raycaster;
@@ -94,7 +97,8 @@ function init() {
 	// Update the controls after any manual changes to the camera's transform
 	camera.position.set(7, 3, 6);
 	controls.update();
-
+	// add the group to the scene
+	scene.add(group);
 	// // Set the cube's position, scale, and rotation
 	// cube.position.x = 0;
 	// cube.scale.set(2, 2, 2);
@@ -148,8 +152,8 @@ function loadmodels() {
 
 			await renderer.compileAsync(model3, camera, scene);
 
-			scene.add(model3);
-
+			// scene.add(model3);
+			group.add(model3);
 			// render();
 		});
 		// model2
@@ -216,7 +220,7 @@ function initVR() {
 	const loader = new GLTFLoader().setPath(basePath);
 	loader.load('low_poly_blue_handgun_pistol/scene.gltf', async function (gltf) {
 		// gltf.scene.scale.set(0.0003, 0.0003, 0.0003);
-		gltf.scene.scale.set(0.2003, 0.2003, 0.2003);
+		gltf.scene.scale.set(0.1003, 0.1003, 0.1003);
 
 		let mymodel = gltf.scene;
 		mymodel.rotation.y = THREE.MathUtils.degToRad(-90);
@@ -242,15 +246,85 @@ function initVR() {
 	// Create a raycaster
 	raycaster = new THREE.Raycaster();
 }
-function onSelectStart(event) {}
-function onSelectEnd(event) {}
+function onSelectStart(event) {
+	const controller = event.target;
+
+	const intersections = getIntersections(controller);
+
+	if (intersections.length > 0) {
+		const intersection = intersections[0];
+
+		const object = intersection.object;
+		object.material.emissive.b = 1;
+		controller.attach(object);
+
+		controller.userData.selected = object;
+	}
+
+	controller.userData.targetRayMode = event.data.targetRayMode;
+}
+
+function onSelectEnd(event) {
+	const controller = event.target;
+
+	if (controller.userData.selected !== undefined) {
+		const object = controller.userData.selected;
+		object.material.emissive.b = 0;
+		group.attach(object);
+
+		controller.userData.selected = undefined;
+	}
+}
+
+function getIntersections(controller) {
+	controller.updateMatrixWorld();
+
+	raycaster.setFromXRController(controller);
+
+	return raycaster.intersectObjects(group.children, true);
+}
+
+function intersectObjects(controller) {
+	// Do not highlight in mobile-ar
+
+	if (controller.userData.targetRayMode === 'screen') return;
+
+	// Do not highlight when already selected
+
+	if (controller.userData.selected !== undefined) return;
+
+	const line = controller.getObjectByName('line');
+	const intersections = getIntersections(controller);
+
+	if (intersections.length > 0) {
+		const intersection = intersections[0];
+
+		const object = intersection.object;
+		object.material.emissive.r = 1;
+		intersected.push(object);
+
+		line.scale.z = intersection.distance;
+	} else {
+		line.scale.z = 5;
+	}
+}
+
+function cleanIntersected() {
+	while (intersected.length) {
+		const object = intersected.pop();
+		object.material.emissive.r = 0;
+	}
+}
 /**
  * Animates the scene by updating the controls and rendering the scene with the camera.
  */
 function animate() {
 	renderer.setAnimationLoop(function () {
-		renderer.render(scene, camera);
+		cleanIntersected();
+		intersectObjects(controller1);
+		intersectObjects(controller2);
 		controls.update();
+		renderer.render(scene, camera);
 	});
 }
 
