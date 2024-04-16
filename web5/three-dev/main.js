@@ -216,7 +216,7 @@ function initVR() {
 	const loader = new GLTFLoader().setPath(basePath);
 	loader.load('low_poly_blue_handgun_pistol/scene.gltf', async function (gltf) {
 		// gltf.scene.scale.set(0.0003, 0.0003, 0.0003);
-		gltf.scene.scale.set(0.3003, 0.3003, 0.3003);
+		gltf.scene.scale.set(0.2003, 0.2003, 0.2003);
 
 		let mymodel = gltf.scene;
 		mymodel.rotation.y = THREE.MathUtils.degToRad(-90);
