@@ -18,7 +18,6 @@ let controllerGrip1, controllerGrip2;
 let raycaster;
 const intersected = [];
 const tempMatrix = new THREE.Matrix4();
-let group;
 // Declare variables for the scene, camera, renderer, cube, and controls
 let container, camera, scene, renderer, cube, controls;
 let lastLoggedPosition = null;
