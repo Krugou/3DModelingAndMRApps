@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {RGBELoader} from 'three/addons/loaders/RGBELoader.js';
 import {VRButton} from 'three/addons/webxr/VRButton.js';
+import {XRControllerModelFactory} from 'three/addons/webxr/XRControllerModelFactory.js';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 let basePath;
 if (import.meta.env.MODE === 'production') {
@@ -9,9 +10,16 @@ if (import.meta.env.MODE === 'production') {
 } else {
 	basePath = '/';
 }
+let controller1, controller2;
+let controllerGrip1, controllerGrip2;
+let raycaster;
+const intersected = [];
+const tempMatrix = new THREE.Matrix4();
+let group;
 // Declare variables for the scene, camera, renderer, cube, and controls
 let container, camera, scene, renderer, cube, controls;
 let lastLoggedPosition = null;
+
 // Call the init function to initialize the scene
 init();
 
@@ -53,7 +61,7 @@ function init() {
 	// Create a new THREE.WebGLRenderer object
 	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.xr.enabled = true;
+
 	container.appendChild(renderer.domElement);
 
 	// Create a cube using THREE.BoxGeometry and THREE.MeshPhongMaterial
@@ -91,7 +99,7 @@ function init() {
 	// cube.position.x = 0;
 	// cube.scale.set(2, 2, 2);
 	// cube.rotation.y = Math.PI / 4;
-	document.body.appendChild(VRButton.createButton(renderer));
+
 	// Call the animate function to start the animation loop
 	animate();
 }
@@ -159,7 +167,83 @@ function loadmodels() {
 		});
 	});
 }
+initVR();
 
+/**
+ * Initializes the VR environment.
+ */
+function initVR() {
+	// Enable WebXR in the renderer
+	document.body.appendChild(VRButton.createButton(renderer));
+	renderer.xr.enabled = true;
+
+	// Create and configure the first controller
+	controller1 = renderer.xr.getController(0);
+	// Add event listeners for 'selectstart' and 'selectend' events
+	controller1.addEventListener('selectstart', onSelectStart);
+	controller1.addEventListener('selectend', onSelectEnd);
+	// Add the controller to the scene
+	scene.add(controller1);
+
+	// Create and configure the second controller
+	controller2 = renderer.xr.getController(1);
+	// Add event listeners for 'selectstart' and 'selectend' events
+	controller2.addEventListener('selectstart', onSelectStart);
+	controller2.addEventListener('selectend', onSelectEnd);
+	// Add the controller to the scene
+	scene.add(controller2);
+
+	// Create a factory for controller models
+	const controllerModelFactory = new XRControllerModelFactory();
+
+	// Create and configure the grip for the first controller
+	controllerGrip1 = renderer.xr.getControllerGrip(0);
+	// Add a model to the grip
+	controllerGrip1.add(
+		controllerModelFactory.createControllerModel(controllerGrip1),
+	);
+	// Add the grip to the scene
+	scene.add(controllerGrip1);
+
+	// Create and configure the grip for the second controller
+	controllerGrip2 = renderer.xr.getControllerGrip(1);
+	// Add a model to the grip
+	// controllerGrip2.add(
+	// 	controllerModelFactory.createControllerModel(controllerGrip2),
+	// );
+	// // Add the grip to the scene
+	scene.add(controllerGrip2);
+	const loader = new GLTFLoader().setPath(basePath);
+	loader.load('low_poly_blue_handgun_pistol/scene.gltf', async function (gltf) {
+		// gltf.scene.scale.set(0.0003, 0.0003, 0.0003);
+		gltf.scene.scale.set(0.3003, 0.3003, 0.3003);
+
+		let mymodel = gltf.scene;
+		mymodel.rotation.y = THREE.MathUtils.degToRad(-90);
+		mymodel.rotation.x = THREE.MathUtils.degToRad(-30);
+		mymodel.position.set(0, 0.01, 0);
+		controllerGrip2.add(mymodel);
+	});
+	// Create a line geometry
+	const geometry = new THREE.BufferGeometry().setFromPoints([
+		new THREE.Vector3(0, 0, 0),
+		new THREE.Vector3(0, 0, -1),
+	]);
+
+	// Create a line using the geometry
+	const line = new THREE.Line(geometry);
+	line.name = 'line';
+	line.scale.z = 5;
+
+	// Add a clone of the line to each controller
+	controller1.add(line.clone());
+	controller2.add(line.clone());
+
+	// Create a raycaster
+	raycaster = new THREE.Raycaster();
+}
+function onSelectStart(event) {}
+function onSelectEnd(event) {}
 /**
  * Animates the scene by updating the controls and rendering the scene with the camera.
  */
