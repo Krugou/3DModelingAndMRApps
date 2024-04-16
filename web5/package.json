@@ -3,6 +3,7 @@
 	"scripts": {
 		"start": "npm run dev",
 		"dev": "npm i && vite --port 1989 --open --host",
+		"vrdev": "cross-env USE_SSL=true npm run dev",
 		"build": "npm i && vite build --emptyOutDir"
 	},
 	"dependencies": {
@@ -10,6 +11,8 @@
 		"three": "^0.162.0"
 	},
 	"devDependencies": {
+		"@vitejs/plugin-basic-ssl": "^1.1.0",
+		"cross-env": "^7.0.3",
 		"vite": "^5.2.2"
 	}
 }
