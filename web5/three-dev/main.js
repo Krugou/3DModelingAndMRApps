@@ -131,12 +131,12 @@ function loadmodels() {
 			modelmazda.position.set(17, 0, -1);
 
 			await renderer.compileAsync(modelmazda, camera, scene);
-
+			teleportgroup.add(modelmazda);
 			scene.add(modelmazda);
 
 			// render();
 		});
-		teleportgroup.add(modelmazda);
+
 		// model2
 		loader.load('tow_boat/scene.gltf', async function (gltf) {
 			const model2 = gltf.scene;
