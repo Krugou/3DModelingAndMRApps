@@ -13,6 +13,13 @@ if (import.meta.env.MODE === 'production') {
 // create a new empty group to include imported models you want to interact with
 let group = new THREE.Group();
 group.name = 'Interaction-Group';
+
+let marker, baseReferenceSpace;
+let INTERSECTION;
+// create a new empty group to include imported models you want
+// to teleport with
+let teleportgroup = new THREE.Group();
+teleportgroup.name = 'Teleport-Group';
 let controller1, controller2;
 let controllerGrip1, controllerGrip2;
 let raycaster;
@@ -37,7 +44,8 @@ function init() {
 	scene = new THREE.Scene();
 
 	loadmodels();
-
+	// add the empty group to the scene
+	scene.add(teleportgroup);
 	// Create a new THREE.PerspectiveCamera object
 	camera = new THREE.PerspectiveCamera(
 		75, // Field of view
@@ -128,7 +136,7 @@ function loadmodels() {
 
 			// render();
 		});
-
+		teleportgroup.add(modelmazda);
 		// model2
 		loader.load('tow_boat/scene.gltf', async function (gltf) {
 			const model2 = gltf.scene;
@@ -171,7 +179,11 @@ function loadmodels() {
 	});
 }
 initVR();
-
+marker = new THREE.Mesh(
+	new THREE.CircleGeometry(0.25, 32).rotateX(-Math.PI / 2),
+	new THREE.MeshBasicMaterial({color: 0x2c2c2c}),
+);
+scene.add(marker);
 /**
  * Initializes the VR environment.
  */
@@ -179,7 +191,10 @@ function initVR() {
 	// Enable WebXR in the renderer
 	document.body.appendChild(VRButton.createButton(renderer));
 	renderer.xr.enabled = true;
-
+	renderer.xr.addEventListener(
+		'sessionstart',
+		() => (baseReferenceSpace = renderer.xr.getReferenceSpace()),
+	);
 	// Create and configure the first controller
 	controller1 = renderer.xr.getController(0);
 	// Add event listeners for 'selectstart' and 'selectend' events
@@ -217,15 +232,25 @@ function initVR() {
 	// // Add the grip to the scene
 	scene.add(controllerGrip2);
 	const loader = new GLTFLoader().setPath(basePath);
-	loader.load('low_poly_blue_handgun_pistol/scene.gltf', async function (gltf) {
+	loader.load('low_poly_blue_handgun_pistol/scene.gltf', function (gltf) {
 		// gltf.scene.scale.set(0.0003, 0.0003, 0.0003);
 		gltf.scene.scale.set(0.1003, 0.1003, 0.1003);
 
 		let mymodel = gltf.scene;
 		mymodel.rotation.y = THREE.MathUtils.degToRad(-90);
 		mymodel.rotation.x = THREE.MathUtils.degToRad(-30);
-		mymodel.position.set(0, 0.01, 0);
-		controllerGrip2.add(mymodel);
+
+		// Move the model a little lower
+		mymodel.position.set(0, -0.11, 0);
+
+		// Add the model to the first controller
+		controllerGrip1.add(mymodel);
+
+		// Clone the model
+		let mymodel2 = mymodel.clone();
+
+		// Add the cloned model to the second controller
+		controllerGrip2.add(mymodel2);
 	});
 	// Create a line geometry
 	const geometry = new THREE.BufferGeometry().setFromPoints([
@@ -244,6 +269,52 @@ function initVR() {
 
 	// Create a raycaster
 	raycaster = new THREE.Raycaster();
+
+	/**
+	 * Event listeners for controller squeeze events.
+	 *
+	 * These event listeners are set up for two VR controllers, `controller1` and `controller2`.
+	 * Each controller has two events that we listen for: 'squeezestart' and 'squeezeend'.
+	 *
+	 * 'squeezestart' is fired when the user starts squeezing the controller's trigger, and
+	 * 'squeezeend' is fired when the user releases the trigger.
+	 *
+	 * The `onSqueezeStart` function is called when a 'squeezestart' event is fired, and the
+	 * `onSqueezeEnd` function is called when a 'squeezeend' event is fired. These functions
+	 * should be defined elsewhere in your code and are used to handle the logic that should
+	 * occur when the user starts and stops squeezing the controller's trigger.
+	 */
+	controller1.addEventListener('squeezestart', onSqueezeStart);
+	controller1.addEventListener('squeezeend', onSqueezeEnd);
+
+	controller2.addEventListener('squeezestart', onSqueezeStart);
+	controller2.addEventListener('squeezeend', onSqueezeEnd);
+}
+function moveMarker() {
+	INTERSECTION = undefined;
+	if (controller1.userData.isSqueezing === true) {
+		tempMatrix.identity().extractRotation(controller1.matrixWorld);
+		raycaster.ray.origin.setFromMatrixPosition(controller1.matrixWorld);
+		raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+		//const intersects = raycaster.intersectObjects([floor]);
+		const intersects = raycaster.intersectObjects(teleportgroup.children, true);
+		if (intersects.length > 0) {
+			INTERSECTION = intersects[0].point;
+			console.log(intersects[0]);
+			console.log(INTERSECTION);
+		}
+	} else if (controller2.userData.isSqueezing === true) {
+		tempMatrix.identity().extractRotation(controller2.matrixWorld);
+		raycaster.ray.origin.setFromMatrixPosition(controller2.matrixWorld);
+		raycaster.ray.direction.set(0, 0, -1).applyMatrix4(tempMatrix);
+		// const intersects = raycaster.intersectObjects([floor]);
+		const intersects = raycaster.intersectObjects(teleportgroup.children, true);
+		if (intersects.length > 0) {
+			INTERSECTION = intersects[0].point;
+		}
+	}
+	if (INTERSECTION) marker.position.copy(INTERSECTION);
+	marker.visible = INTERSECTION !== undefined;
 }
 function onSelectStart(event) {
 	const controller = event.target;
@@ -262,7 +333,40 @@ function onSelectStart(event) {
 
 	controller.userData.targetRayMode = event.data.targetRayMode;
 }
-
+function onSqueezeStart() {
+	this.userData.isSqueezing = true;
+	console.log('Controller squeeze started');
+}
+function onSqueezeEnd() {
+	this.userData.isSqueezing = false;
+	console.log('squeezeend');
+	if (INTERSECTION) {
+		const offsetPosition = {
+			x: -INTERSECTION.x,
+			y: -INTERSECTION.y,
+			z: -INTERSECTION.z,
+			w: 1,
+		};
+		const offsetRotation = new THREE.Quaternion();
+		const transform = new XRRigidTransform(offsetPosition, offsetRotation);
+		const teleportSpaceOffset =
+			baseReferenceSpace.getOffsetReferenceSpace(transform);
+		renderer.xr.setReferenceSpace(teleportSpaceOffset);
+	}
+}
+/**
+ * Handles the end of a selection event.
+ *
+ * This function is triggered when a selection event ends. It checks if an object
+ * has been selected by the controller. If an object has been selected, it resets
+ * the object's emissive blue color to 0 and attaches the object to the group.
+ * Finally, it clears the controller's selection.
+ *
+ * @param {Object} event - The event object. It's expected to have a `target` property,
+ * which represents the controller. The controller is expected to have a `userData`
+ * property, which is an object that can have a `selected` property representing the
+ * selected object.
+ */
 function onSelectEnd(event) {
 	const controller = event.target;
 
@@ -322,6 +426,7 @@ function animate() {
 		cleanIntersected();
 		intersectObjects(controller1);
 		intersectObjects(controller2);
+		moveMarker();
 		controls.update();
 		renderer.render(scene, camera);
 	});
