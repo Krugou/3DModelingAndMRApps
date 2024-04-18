@@ -131,7 +131,7 @@ function loadmodels() {
 			modelmazda.position.set(17, 0, -1);
 
 			await renderer.compileAsync(modelmazda, camera, scene);
-			teleportgroup.add(modelmazda);
+
 			scene.add(modelmazda);
 
 			// render();
@@ -142,11 +142,12 @@ function loadmodels() {
 			const model2 = gltf.scene;
 
 			// wait until the model can be added to the scene without blocking due to shader compilation
-			model2.position.set(-20, -10, -1);
+			model2.position.set(-20, 5, -1);
+			model2.rotation.y = THREE.MathUtils.degToRad(90);
 
 			await renderer.compileAsync(model2, camera, scene);
-
-			scene.add(model2);
+			teleportgroup.add(model2);
+			// scene.add(model2);
 
 			// render();
 		});
@@ -217,9 +218,9 @@ function initVR() {
 	// Create and configure the grip for the first controller
 	controllerGrip1 = renderer.xr.getControllerGrip(0);
 	// Add a model to the grip
-	controllerGrip1.add(
-		controllerModelFactory.createControllerModel(controllerGrip1),
-	);
+	// controllerGrip1.add(
+	// 	controllerModelFactory.createControllerModel(controllerGrip1),
+	// );
 	// Add the grip to the scene
 	scene.add(controllerGrip1);
 
