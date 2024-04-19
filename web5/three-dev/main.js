@@ -73,6 +73,7 @@ function init() {
 	// Create a new THREE.WebGLRenderer object
 	renderer = new THREE.WebGLRenderer({antialias: true});
 	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.shadowMap.enabled = true;
 
 	container.appendChild(renderer.domElement);
 
@@ -93,6 +94,7 @@ function init() {
 
 	// Add ambient light to the scene
 	const light = new THREE.AmbientLight(0x404040); // soft white light
+	light.castShadow = true;
 	scene.add(light);
 
 	// Set the camera's position and look at the axes helper
@@ -124,7 +126,6 @@ function loadmodels() {
 		scene.environment = texture;
 		renderer.toneMappingExposure = 10.0;
 		// modelmazda
-
 		const loader = new GLTFLoader().setPath(basePath);
 		loader.load('mazda.gltf', async function (gltf) {
 			const modelmazda = gltf.scene;
